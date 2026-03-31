@@ -32,6 +32,25 @@ This project includes a small set of scheduling improvements implemented in the 
 
 These features are intentionally simple and designed to be clear and easy to extend in future iterations.
 
+## Testing PawPal+
+
+Run the automated test suite with:
+
+```bash
+python -m pytest
+```
+
+The tests included cover:
+
+- Basic Task and Pet behavior (adding tasks, marking complete)
+- Sorting correctness (tasks returned in chronological order)
+- Recurrence logic (marking a daily task complete creates a new task for the next day)
+- Conflict detection (identifies exact-time scheduling conflicts across pets)
+
+Confidence level: ★★★★☆ (4/5)
+
+Reason: The current tests cover core behaviors and the lightweight scheduler algorithms (sorting, recurrence, exact-time conflicts). More edge cases—like overlapping-duration conflicts, timezone handling, and persistence—should be tested in future iterations to increase confidence to 5 stars.
+
 ## Getting started
 
 ### Setup
