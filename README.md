@@ -22,6 +22,16 @@ Your final app should:
 - Display the plan clearly (and ideally explain the reasoning)
 - Include tests for the most important scheduling behaviors
 
+## Smarter Scheduling
+
+This project includes a small set of scheduling improvements implemented in the logic layer (`pawpal_system.py`):
+
+- Sorting and filtering: tasks can be sorted by scheduled time and filtered by pet or status.
+- Recurring tasks: tasks with `frequency='daily'` or `frequency='weekly'` automatically generate the next occurrence when marked complete.
+- Conflict detection: a lightweight detector scans for exact timestamp conflicts across a user's pets and returns warnings instead of failing.
+
+These features are intentionally simple and designed to be clear and easy to extend in future iterations.
+
 ## Getting started
 
 ### Setup

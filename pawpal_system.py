@@ -38,6 +38,17 @@ class Task:
 		self.status = "completed"
 		self.completed_at = when or datetime.now()
 
+	def next_due(self) -> Optional[datetime]:
+		"""Return the next due datetime for recurring tasks, or None if not recurring."""
+		if not self.frequency:
+			return None
+		if self.frequency.lower() == "daily":
+			return self.task_time + timedelta(days=1)
+		if self.frequency.lower() == "weekly":
+			return self.task_time + timedelta(weeks=1)
+		# Unknown frequency formats can be handled later
+		return None
+
 	def edit(self, description: Optional[str] = None, task_time: Optional[datetime] = None, frequency: Optional[str] = None) -> None:
 		"""Edit the task in-place. Only supplied fields are changed."""
 		if description is not None:
@@ -187,7 +198,56 @@ class Scheduler:
 
 	@staticmethod
 	def mark_task_complete(task: Task, when: Optional[datetime] = None) -> None:
+		"""Mark a task complete; return a newly created Task for the next occurrence
+		if the task is recurring (daily/weekly). The caller may add the returned
+		Task to the appropriate Pet.
+		"""
 		task.mark_complete(when=when)
+		# Handle recurring tasks by returning a new Task instance when applicable
+		next_dt = task.next_due()
+		if next_dt:
+			return Task(description=task.description, task_time=next_dt, frequency=task.frequency)
+		return None
+
+	@staticmethod
+	def sort_by_time(tasks: Iterable[Task]) -> List[Task]:
+		"""Return tasks sorted by their scheduled time (earliest first)."""
+		return sorted(tasks, key=lambda t: t.task_time)
+
+	@staticmethod
+	def filter_tasks(owner: Owner, status: Optional[str] = None, pet_name: Optional[str] = None) -> List[Task]:
+		"""Return tasks filtered by optional status and/or pet name."""
+		tasks = []
+		for pet in owner.view_pets():
+			if pet_name and pet.name != pet_name:
+				continue
+			for t in pet.get_tasks():
+				if status and t.status != status:
+					continue
+				tasks.append(t)
+		return tasks
+
+	@staticmethod
+	def detect_conflicts(owner: Owner) -> List[str]:
+		"""Detect tasks scheduled at the exact same time; return warnings.
+
+		This is a lightweight conflict detector: it only checks for exact datetime
+		matches rather than overlapping durations.
+		"""
+		warnings: List[str] = []
+		# Map datetime -> list of (pet, task)
+		time_map: Dict[datetime, List[tuple]] = {}
+		for pet in owner.view_pets():
+			for t in pet.get_tasks():
+				if t.status != "pending":
+					continue
+				time_map.setdefault(t.task_time, []).append((pet.name, t))
+
+		for when, entries in time_map.items():
+			if len(entries) > 1:
+				pet_names = ", ".join({p for p, _ in entries})
+				warnings.append(f"Conflict at {when.isoformat()}: tasks for {pet_names}")
+		return warnings
 
 
 if __name__ == "__main__":
