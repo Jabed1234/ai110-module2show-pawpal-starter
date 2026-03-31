@@ -6,6 +6,29 @@
 
 - Briefly describe your initial UML design.
 - What classes did you include, and what responsibilities did you assign to each?
+1. User
+- Name
+- Username
+- List of pets
+- addPet()
+- removePet()
+- viewPets()
+- viewTasks()
+2. Pet
+- pet name
+- tasks
+- addTask()
+- removeTask()
+- getTasks()
+3. task
+- task type
+- task time
+- taskStatus
+- markComplete()
+- editTask()
+- deleteTask()
+
+
 
 **b. Design changes**
 
