@@ -32,6 +32,17 @@ This project includes a small set of scheduling improvements implemented in the 
 
 These features are intentionally simple and designed to be clear and easy to extend in future iterations.
 
+## Features
+
+Implemented features in this repository (what the app currently does):
+
+- Sorting by time: tasks are ordered chronologically using Scheduler.sort_by_time.
+- Filtering: tasks can be filtered by pet name and/or status using Scheduler.filter_tasks.
+- Recurring tasks: tasks with `frequency='daily'` or `frequency='weekly'` automatically generate the next occurrence when marked complete (Scheduler.mark_task_complete).
+- Conflict warnings: Scheduler.detect_conflicts scans for exact timestamp collisions across pets and returns warnings shown in the UI.
+- UI integration: Streamlit `app.py` stores the Owner in `st.session_state`, displays sorted task tables, surfaces conflict warnings with `st.warning`, and provides per-task "Mark complete" buttons that trigger recurrence.
+- Tests: an automated pytest suite (see `tests/test_pawpal.py`) verifies sorting, recurrence, and conflict detection behavior.
+
 ## Testing PawPal+
 
 Run the automated test suite with:
