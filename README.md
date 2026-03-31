@@ -81,3 +81,21 @@ pip install -r requirements.txt
 5. Add tests to verify key behaviors.
 6. Connect your logic to the Streamlit UI in `app.py`.
 7. Refine UML so it matches what you actually built.
+
+## 📸 Demo
+
+Run the Streamlit app locally and take a screenshot to show the final UI.
+
+1. Start the app:
+
+```bash
+streamlit run app.py
+```
+
+2. Open the app in your browser (Streamlit prints the local URL).
+3. Take a screenshot of the main UI and save it to `
+
+Then include the screenshot here by replacing the placeholder below (or I can add it for you if you upload the image):
+<a href="/course_images/ai110/streamlit.png" target="_blank"><img src='/course_images/ai110/streamlit.png' title='PawPal App' width='' alt='PawPal App' class='center-block' /></a>
+
+![alt text](streamlit.png)
