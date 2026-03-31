@@ -72,8 +72,32 @@ def _show_owner_tasks(owner: Owner):
         if not tasks:
             st.write("- No tasks")
             continue
-        for t in sorted(tasks, key=lambda x: x.task_time):
-            st.write(f"- {t.task_time.strftime('%Y-%m-%d %H:%M')}: {t.description} (status={t.status})")
+
+        # Use the Scheduler sort helper for clarity
+        sorted_tasks = Scheduler.sort_by_time(tasks)
+
+        # Build a table-friendly list for display
+        rows = []
+        for idx, t in enumerate(sorted_tasks):
+            rows.append({
+                "time": t.task_time.strftime("%Y-%m-%d %H:%M"),
+                "description": t.description,
+                "status": t.status,
+                "frequency": t.frequency or "",
+            })
+
+        st.table(rows)
+
+        # Interactive controls: mark tasks complete
+        for idx, t in enumerate(sorted_tasks):
+            key = f"complete_{pet.name}_{idx}_{t.task_time.isoformat()}"
+            if st.button(f"Mark complete: {t.description}", key=key):
+                new_task = Scheduler.mark_task_complete(t)
+                if new_task:
+                    pet.add_task(new_task)
+                    st.success(f"Marked '{t.description}' complete and created next occurrence @ {new_task.task_time.strftime('%Y-%m-%d %H:%M')}")
+                else:
+                    st.success(f"Marked '{t.description}' complete")
 
 col1, col2, col3 = st.columns(3)
 with col1:
@@ -119,7 +143,20 @@ if st.button("Generate schedule"):
         st.info("No upcoming tasks in the next 24 hours.")
     else:
         st.subheader("Upcoming tasks (24h)")
+        # Display upcoming tasks as a table
+        table_rows = []
         for t in upcoming:
-            # find which pet this task belongs to for display
             pet_name_for_task = next((p.name for p in owner.pets if t in p.tasks), "(unknown)")
-            st.write(f"- {t.task_time.strftime('%Y-%m-%d %H:%M')} — {pet_name_for_task}: {t.description}")
+            table_rows.append({
+                "time": t.task_time.strftime("%Y-%m-%d %H:%M"),
+                "pet": pet_name_for_task,
+                "task": t.description,
+                "status": t.status,
+            })
+        st.table(table_rows)
+
+    # Show conflict warnings prominently
+    conflicts = Scheduler.detect_conflicts(owner)
+    if conflicts:
+        for c in conflicts:
+            st.warning(c)

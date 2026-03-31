@@ -1,0 +1,52 @@
+%% Mermaid class diagram for PawPal+ (final)
+classDiagram
+    class Owner {
+        - name: str
+        - username: str
+        - pets: List~Pet~
+        + add_pet(p: Pet)
+        + remove_pet(p: Pet)
+        + view_pets(): List~Pet~
+        + get_all_tasks(): List~Task~
+        + find_pet(name: str): Pet
+    }
+
+    class Pet {
+        - name: str
+        - species: Optional[str]
+        - tasks: List~Task~
+        + add_task(t: Task)
+        + remove_task(t: Task)
+        + get_tasks(include_deleted: bool = False): List~Task~
+    }
+
+    class Task {
+        - description: str
+        - task_time: datetime
+        - frequency: Optional[str]
+        - status: str
+        - completed_at: Optional[datetime]
+        + mark_complete(when?: datetime)
+        + edit(...)
+        + delete(soft: bool = True)
+        + next_due(): Optional[datetime]
+        + to_dict(): dict
+    }
+
+    class Scheduler {
+        + all_tasks(owner: Owner)
+        + upcoming_tasks(owner: Owner, within: timedelta)
+        + overdue_tasks(owner: Owner)
+        + next_task(owner: Owner)
+        + tasks_by_day(owner: Owner, day: date)
+        + mark_task_complete(task: Task)
+        + sort_by_time(tasks: List~Task~)
+        + filter_tasks(owner: Owner, status?: str, pet_name?: str)
+        + detect_conflicts(owner: Owner)
+    }
+
+    Owner "1" --> "*" Pet : owns
+    Pet "1" --> "*" Task : has
+    Scheduler ..> Owner : reads
+    Scheduler ..> Pet : reads
+    Scheduler ..> Task : reads/creates
